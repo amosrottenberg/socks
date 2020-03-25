@@ -22,13 +22,16 @@ class ClientSession:
         return (client_packet.remote_address, client_packet.remote_port)
 
     def listener_handler(self, send_to_target):
-        while True:
-            send_to_target.append(self.client_conn.recv(1024))
+        with self.client_conn:
+            while True:
+                print(self.client_conn.recv(1024))
+                send_to_target.append(self.client_conn.recv(1024))
 
     def sender_handler(self, send_to_client):
-        while True:
-            if send_to_client:
-                self.client_conn.sendall(send_to_client.pop(0))
+        with self.client_conn:
+            while True:
+                if send_to_client:
+                    self.client_conn.sendall(send_to_client.pop(0))
 
     def start_threads(self, send_to_target, send_to_client):
         self.listener_thread = threading.Thread(target=self.listener_handler,

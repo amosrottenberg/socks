@@ -18,8 +18,7 @@ class SessionsManager:
         self.target_session.create_connection()
         self.client_session.start_threads(self.send_to_target, self.send_to_client)
         self.target_session.start_threads(self.send_to_target, self.send_to_client)
-        while True:
-            pass
+
 
 
 if __name__ == '__main__':

@@ -16,13 +16,15 @@ class TargetSession:
         self.target_conn.connect((self.target_ip, self.target_port))
 
     def listener_handler(self, send_to_client):
-        while True:
-            send_to_client.append(self.target_conn.recv(1024))
+        with self.target_conn:
+            while True:
+                send_to_client.append(self.target_conn.recv(1024))
 
     def sender_handler(self, send_to_target):
-        while True:
-            if send_to_target:
-                self.target_conn.sendall(send_to_target.pop(0))
+        with self.target_conn:
+            while True:
+                if send_to_target:
+                    self.target_conn.sendall(send_to_target.pop(0))
 
     def start_threads(self, send_to_target, send_to_client):
         self.listener_thread = threading.Thread(target=self.listener_handler,
