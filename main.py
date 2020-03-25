@@ -14,6 +14,8 @@ def main():
             client_sessios = session.SessionsManager()
             client_sessios.start_sessions(conn, addr[0], addr[1])
             sessions_list.append(client_sessios)
+            print(addr)
+            print(len(sessions_list))
 
 
 if __name__ == '__main__':

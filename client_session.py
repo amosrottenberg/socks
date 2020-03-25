@@ -12,9 +12,7 @@ class ClientSession:
         self.sender_thread = None
         
     def new_connection_handler(self):
-        print('Connected by', self.client_ip, self.client_port)
         data = self.client_conn.recv(1024)
-        print(data)
         client_packet = socks_client_packet.SocksClientPacket()
         client_packet.resolve_data(data)
         data_to_send = client_packet.create_result_packet(90)
@@ -24,7 +22,6 @@ class ClientSession:
     def listener_handler(self, send_to_target):
         with self.client_conn:
             while True:
-                print(self.client_conn.recv(1024))
                 send_to_target.append(self.client_conn.recv(1024))
 
     def sender_handler(self, send_to_client):

@@ -17,13 +17,11 @@ class SocksClientPacket:
         self.remote_port = int(data[2:4].hex(), 16)
         self.remote_address = str(ipaddress.IPv4Address(data[4:8]))
         self.name = data[8]
-        print(self.version, self.command, self.remote_port, self.remote_address, self.name)
 
     def create_result_packet(self, result_code):
         data = RESULT_PACKT
         data[1] = result_code
         data = bytes(''.join([chr(val) for val in data]), 'utf-8')
-        print(data)
         return data
 
 
