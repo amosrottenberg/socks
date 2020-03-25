@@ -4,30 +4,42 @@ import socks_client_packet
 
 class ClientSession:
 
-    def __init__(self, client_ip, client_port, conn):
+    def __init__(self, conn, client_ip, client_port):
         self.client_ip = client_ip
         self.client_port = client_port
         self.client_conn = conn
-        self.target_ip = None
-        self.target_port = None
-        self.target_conn = None
-        self.seesion_thread = None
-        self.new_connection_handler()
-
-    # def start_new_connection(self):
-
+        self.listener_thread = None
+        self.sender_thread = None
+        
     def new_connection_handler(self):
-        with self.client_conn:
-            print('Connected by', self.client_ip, self.client_port)
-            while True:
-                data = self.client_conn.recv(1024)
-                print(data)
-                client_packet = socks_client_packet.SocksClientPacket()
-                client_packet.resolve_data(data)
-                # print(str(data.decode('utf-16-le'), "utf-16"))
-                data_to_send = client_packet.create_result_packet(90)
-                if not data_to_send: break
-                self.client_conn.sendall(data_to_send)
+        print('Connected by', self.client_ip, self.client_port)
+        data = self.client_conn.recv(1024)
+        print(data)
+        client_packet = socks_client_packet.SocksClientPacket()
+        client_packet.resolve_data(data)
+        data_to_send = client_packet.create_result_packet(90)
+        self.client_conn.sendall(data_to_send)
+        return (client_packet.remote_address, client_packet.remote_port)
+
+    def listener_handler(self, send_to_target):
+        while True:
+            send_to_target.append(self.client_conn.recv(1024))
+
+    def sender_handler(self, send_to_client):
+        while True:
+            if send_to_client:
+                self.client_conn.sendall(send_to_client.pop(0))
+
+    def start_threads(self, send_to_target, send_to_client):
+        self.listener_thread = threading.Thread(target=self.listener_handler,
+                                              args=(send_to_target,))
+        self.sender_thread = threading.Thread(target=self.sender_handler,
+                                              args=(send_to_client,))
+        self.listener_thread.daemon = True
+        self.sender_thread.daemon = True
+        self.listener_thread.start()
+        self.sender_thread.start()
+
 
 if __name__ == '__main__':
     HOST = '127.0.0.1'

@@ -15,7 +15,7 @@ class SocksClientPacket:
         self.version = data[0]
         self.command = data[1]
         self.remote_port = int(data[2:4].hex(), 16)
-        self.remote_address = ipaddress.IPv4Address(data[4:8])
+        self.remote_address = str(ipaddress.IPv4Address(data[4:8]))
         self.name = data[8]
         print(self.version, self.command, self.remote_port, self.remote_address, self.name)
 
